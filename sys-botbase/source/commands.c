@@ -633,6 +633,18 @@ void resetTime()
         fatalThrow(rt);
 }
 
+long getUnixTime()
+{
+	time_t unixTime = 0;
+    Result tg = timeGetCurrentTime(TimeType_UserSystemClock, (u64*)&unixTime);
+    if (R_FAILED(tg))
+	{
+		fatalThrow(tg);
+		return -1;
+	}
+	return unixTime;
+}
+
 void sendUsbResponse(USBResponse response)
 {
     usbCommsWrite((void*)&response, 4);

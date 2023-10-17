@@ -79,4 +79,5 @@ void dateSkip();
 void timeSkipBack();
 void timeSkipForward();
 void resetTime();
+long getUnixTime();
 void sendUsbResponse(USBResponse response);
