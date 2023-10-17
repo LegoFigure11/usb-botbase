@@ -16,7 +16,7 @@
 #include "time.h"
 
 #define TITLE_ID 0x430000000000000B
-#define HEAP_SIZE 0x00300000
+#define HEAP_SIZE 0x00400000
 #define THREAD_SIZE 0x1A000
 
 typedef enum {
@@ -619,7 +619,7 @@ int argmain(int argc, char **argv)
 
     if(!strcmp(argv[0], "pixelPeek")){
         //errors with 0x668CE, unless debugunit flag is patched
-        u64 bSize = 0x7D000;
+        u64 bSize = 0x80000;
         char* buf = malloc(bSize); 
         u64 outSize = 0;
 
@@ -1053,6 +1053,12 @@ int argmain(int argc, char **argv)
     if(!strcmp(argv[0], "daySkip"))
         dateSkip();
 
+    if(!strcmp(argv[0], "timeSkipBack"))
+        timeSkipBack();
+
+    if(!strcmp(argv[0], "timeSkipForward"))
+        timeSkipForward();
+
     if(!strcmp(argv[0], "resetTime"))
         resetTime();
 
@@ -1150,7 +1156,7 @@ void wifiMainLoop()
     int fr_count = 0;
 
     flashLed();
-    while (appletMainLoop())
+    while (true)
     {
         poll(pfds, fd_count, -1);
         mutexLock(&freezeMutex);
