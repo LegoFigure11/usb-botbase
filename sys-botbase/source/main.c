@@ -13,7 +13,6 @@
 #include "util.h"
 #include "freeze.h"
 #include <poll.h>
-#include "time.h"
 
 #define TITLE_ID 0x430000000000000B
 #define HEAP_SIZE 0x00400000
@@ -1063,16 +1062,16 @@ int argmain(int argc, char **argv)
         resetTime();
 
     if (!strcmp(argv[0], "getUnixTime"))
-	{
-		long time = getUnixTime();	
-		if (usb)
-		{
-			response.size = sizeof(long);
-			response.data = &time;
-			sendUsbResponse(response);
-		}
+    {
+        long time = getUnixTime();
+        if (usb)
+        {
+            response.size = sizeof(long);
+            response.data = &time;
+            sendUsbResponse(response);
+        }
         else printf("%016lX\n", time);
-	}
+    }
 
     return 0;
 }
