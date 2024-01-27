@@ -6,6 +6,7 @@
 #include <math.h>
 #include "commands.h"
 #include "util.h"
+#include "ntp.h"
 
 
 //Controller:
@@ -16,6 +17,7 @@ HiddbgHdlsDeviceInfo controllerDevice = {0};
 HiddbgHdlsState controllerState = {0};
 time_t curTime = 0;
 time_t origTime = 0;
+time_t unixTime = 0;
 USBResponse response;
 
 //Keyboard:
@@ -635,7 +637,7 @@ void resetTime()
 
 long getUnixTime()
 {
-	time_t unixTime = 0;
+    time_t unixTime = 0;
     Result tg = timeGetCurrentTime(TimeType_UserSystemClock, (u64*)&unixTime);
     if (R_FAILED(tg))
 	{
@@ -643,6 +645,15 @@ long getUnixTime()
 		return -1;
 	}
 	return unixTime;
+}
+
+void resetTimeNTP()
+{
+    curTime = 0;
+    origTime = 0;
+    Result ts = timeSetCurrentTime(TimeType_NetworkSystemClock, ntpGetTime());
+    if (R_FAILED(ts))
+        fatalThrow(ts);
 }
 
 void sendUsbResponse(USBResponse response)
