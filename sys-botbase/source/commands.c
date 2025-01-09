@@ -601,6 +601,24 @@ void dateSkip()
         fatalThrow(ts);
 }
 
+void dateSkipBack()
+{
+    if (origTime == 0)
+    {
+        Result ot = timeGetCurrentTime(TimeType_UserSystemClock, (u64 *)&origTime);
+        if (R_FAILED(ot))
+            fatalThrow(ot);
+    }
+
+    Result tg = timeGetCurrentTime(TimeType_UserSystemClock, (u64 *)&curTime); // Current system time
+    if (R_FAILED(tg))
+        fatalThrow(tg);
+
+    Result ts = timeSetCurrentTime(TimeType_NetworkSystemClock, (uint64_t)(curTime - 86400)); // Set new time
+    if (R_FAILED(ts))
+        fatalThrow(ts);
+}
+
 void timeSkipBack()
 {
     if (origTime == 0)
