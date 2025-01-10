@@ -1105,6 +1105,9 @@ int argmain(int argc, char **argv)
     if (!strcmp(argv[0], "daySkip"))
         dateSkip();
 
+    if (!strcmp(argv[0], "daySkipBack"))
+        dateSkipBack();
+
     if (!strcmp(argv[0], "timeSkipBack"))
         timeSkipBack();
 
