@@ -716,11 +716,14 @@ void setCurrentTime(u64 time)
 
 void resetTimeNTP()
 {
-    curTime = 0;
-    origTime = 0;
-    Result ts = timeSetCurrentTime(TimeType_NetworkSystemClock, ntpGetTime());
-    if (R_FAILED(ts))
-        fatalThrow(ts);
+    time_t newTime = ntpGetTime();
+    // Do not set bad times that are likely server errors.
+    if (newTime >= 946706400) // New time has to be after 1/1/2000 0:00:00
+    {
+        Result ts = timeSetCurrentTime(TimeType_NetworkSystemClock, newTime);
+        if (R_FAILED(ts))
+            fatalThrow(ts);
+    }
 }
 
 void sendUsbResponse(USBResponse response)
