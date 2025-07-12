@@ -64,6 +64,11 @@ time_t ntpGetTime() {
 
     memcpy((char*)&serv_addr.sin_addr.s_addr, (char*)server->h_addr_list[0], sizeof(serv_addr.sin_addr.s_addr));
     serv_addr.sin_port = htons(123);
+
+    // Set a 2-second receive timeout before connect()
+    struct timeval timeout = {2, 0};
+    setsockopt(sockfd, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(timeout));
+
     if (connect(sockfd, (struct sockaddr*)&serv_addr, sizeof(serv_addr)) < 0) {
         close(sockfd);
         return 0;
@@ -74,16 +79,23 @@ time_t ntpGetTime() {
     packet.li_vn_mode = (0 << 6) | (4 << 3) | 3;              // LI 0 | Client version 4 | Mode 3
     packet.txTm_s = htonl(NTP_TIMESTAMP_DELTA + time(NULL));  // Current networktime on the console
 
-    if (send(sockfd, (char*)&packet, sizeof(ntp_packet), 0) <= 0) { // Return value is bytes received
+    if (send(sockfd, (char*)&packet, sizeof(ntp_packet), 0) != sizeof(ntp_packet)) { // Return value is bytes sent
         close(sockfd);
         return 0;
     }
-    if (recv(sockfd, (char*)&packet, sizeof(ntp_packet), 0) <= 0) { // Return value is bytes received
+    if (recv(sockfd, (char*)&packet, sizeof(ntp_packet), 0) != sizeof(ntp_packet)) { // Return value is bytes received
         close(sockfd);
         return 0;
     }
 
     packet.txTm_s = ntohl(packet.txTm_s);
+
+    // After receiving the packet
+    if (packet.txTm_s == 0 || packet.stratum == 0) {
+        close(sockfd);
+        return 0;
+    }
+
     close(sockfd);
     return (time_t)(packet.txTm_s - NTP_TIMESTAMP_DELTA);
 }
